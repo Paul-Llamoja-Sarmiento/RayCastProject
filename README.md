@@ -1,0 +1,1 @@
+Small raycast project with C and including CMake to generate build files.
