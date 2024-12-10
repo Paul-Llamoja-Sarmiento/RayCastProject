@@ -1,13 +1,15 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-#include  "SDL2/SDL_main.h"
-#include  "SDL2/SDL.h"
+#include "SDL2/SDL_main.h"
+#include "SDL2/SDL.h"
+#include "Player.h"
 
 bool bIsGameRunning = false;
 SDL_Window* windowPtr = NULL;
 SDL_Renderer* rendererPtr = NULL;
 int32_t lastFrameMilliseconds = 0;
+Player myPlayer = { 300, 300, 8, 8 };
 
 bool InitializeWindow(int32_t inWindowWith, int32_t inWindowHeight);
 void ProcessInput();
@@ -15,6 +17,8 @@ void Update();
 void Render();
 void MainLoop();
 void ReleaseMemory();
+
+void DrawPlayer();
 
 
 int main(int argc, char* argv[])
@@ -33,7 +37,7 @@ bool InitializeWindow(int32_t inWindowWith, int32_t inWindowHeight)
     }
 
     windowPtr = SDL_CreateWindow(
-        NULL,
+        "RayCasterProject",
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
         inWindowWith,
@@ -103,8 +107,10 @@ void Update()
 }
 void Render()
 {
+    // Set a light gray background
     SDL_SetRenderDrawColor(rendererPtr, 80, 80, 80, 255);
     SDL_RenderClear(rendererPtr);
+    DrawPlayer();
     SDL_RenderPresent(rendererPtr);
 }
 
@@ -123,4 +129,12 @@ void ReleaseMemory()
     SDL_DestroyRenderer(rendererPtr);
     SDL_DestroyWindow(windowPtr);
     SDL_Quit();
+}
+
+void DrawPlayer()
+{
+    // Display a basic yellow rectangle player
+    SDL_Rect ballRectangle = { myPlayer.m_positionX, myPlayer.m_positionY, myPlayer.m_width, myPlayer.m_height };
+    SDL_SetRenderDrawColor(rendererPtr, 255, 255, 0, 255);
+    SDL_RenderFillRect(rendererPtr, &ballRectangle);
 }
