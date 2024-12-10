@@ -79,6 +79,19 @@ void ProcessInput()
                 bIsGameRunning = false;
                 break;
 
+            case SDLK_w:
+                myPlayer.m_positionY -= 5;
+                break;
+            case SDLK_a:
+                myPlayer.m_positionX -= 5;
+                break;
+            case SDLK_s:
+                myPlayer.m_positionY += 5;
+                break;
+            case SDLK_d:
+                myPlayer.m_positionX += 5;
+                break;
+
             default:
                 break;
             }
