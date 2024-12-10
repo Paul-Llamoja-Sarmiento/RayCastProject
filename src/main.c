@@ -5,11 +5,14 @@
 #include "SDL2/SDL.h"
 #include "Player.h"
 
+
+/////////////////////////////////////////////////////////////////
+// MAIN APP MANAGEMENT 
+/////////////////////////////////////////////////////////////////
 bool bIsGameRunning = false;
 SDL_Window* windowPtr = NULL;
 SDL_Renderer* rendererPtr = NULL;
 int32_t lastFrameMilliseconds = 0;
-Player myPlayer = { 300, 300, 8, 8 };
 
 bool InitializeWindow(int32_t inWindowWith, int32_t inWindowHeight);
 void ProcessInput();
@@ -18,9 +21,32 @@ void Render();
 void MainLoop();
 void ReleaseMemory();
 
+
+/////////////////////////////////////////////////////////////////
+// PLAYER - MAP MANAGEMENT
+/////////////////////////////////////////////////////////////////
+Player myPlayer = { 300, 300, 8, 8 };
+#define MAP_TOTAL_COLUMNS 8
+#define MAP_TOTAL_ROWS 8
+#define MAP_CELL_SIZE 64
+int8_t map2D[] =
+{
+    1,1,1,1,1,1,1,1,
+    1,0,1,0,0,0,0,1,
+    1,0,0,0,0,0,0,1,
+    1,0,0,0,0,0,0,1,
+    1,0,0,0,0,0,0,1,
+    1,0,0,0,0,1,0,1,
+    1,0,0,0,0,0,0,1,
+    1,1,1,1,1,1,1,1
+};
+
 void DrawPlayer();
+void Draw2DMap();
 
-
+/////////////////////////////////////////////////////////////////
+// MAIN FUNCTION
+/////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
     bIsGameRunning = InitializeWindow(1024, 512);
@@ -123,6 +149,7 @@ void Render()
     // Set a light gray background
     SDL_SetRenderDrawColor(rendererPtr, 80, 80, 80, 255);
     SDL_RenderClear(rendererPtr);
+    Draw2DMap();
     DrawPlayer();
     SDL_RenderPresent(rendererPtr);
 }
@@ -150,4 +177,25 @@ void DrawPlayer()
     SDL_Rect ballRectangle = { myPlayer.m_positionX, myPlayer.m_positionY, myPlayer.m_width, myPlayer.m_height };
     SDL_SetRenderDrawColor(rendererPtr, 255, 255, 0, 255);
     SDL_RenderFillRect(rendererPtr, &ballRectangle);
+}
+
+void Draw2DMap()
+{
+    for (size_t y = 0; y < MAP_TOTAL_ROWS; y++)
+    {
+        for (size_t x = 0; x < MAP_TOTAL_COLUMNS; x++)
+        {
+            if (map2D[y * MAP_TOTAL_COLUMNS + x] == 0)
+            {
+                SDL_SetRenderDrawColor(rendererPtr, 0, 0, 0, 255);
+            }
+            else
+            {
+                SDL_SetRenderDrawColor(rendererPtr, 255, 255, 255, 255);
+            }
+
+            SDL_Rect wallRectangle = { x * MAP_CELL_SIZE + 1, y * MAP_CELL_SIZE + 1 , MAP_CELL_SIZE - 2, MAP_CELL_SIZE - 2};
+            SDL_RenderFillRect(rendererPtr, &wallRectangle);
+        }
+    }
 }
