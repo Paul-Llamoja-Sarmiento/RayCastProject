@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdbool.h>
+#include <math.h>
 
 #include "SDL2/SDL_main.h"
 #include "SDL2/SDL.h"
@@ -25,7 +26,8 @@ void ReleaseMemory();
 /////////////////////////////////////////////////////////////////
 // PLAYER - MAP MANAGEMENT
 /////////////////////////////////////////////////////////////////
-Player myPlayer = { 300, 300, 8, 8 };
+#define PI 3.141592
+Player myPlayer = { 300, 300, 8, 8, 0 };
 #define MAP_TOTAL_COLUMNS 8
 #define MAP_TOTAL_ROWS 8
 #define MAP_CELL_SIZE 64
@@ -69,6 +71,7 @@ bool InitializeWindow(int32_t inWindowWith, int32_t inWindowHeight)
         inWindowWith,
         inWindowHeight,
         SDL_WINDOW_SHOWN);
+
     if (windowPtr == NULL)
     {
         printf("Window could not be created: %s\n", SDL_GetError());
@@ -82,7 +85,6 @@ bool InitializeWindow(int32_t inWindowWith, int32_t inWindowHeight)
         return false;
     }
 
-    // SDL_SetWindowFullscreen(p_window, 0);
     return true;
 }
 
@@ -106,16 +108,23 @@ void ProcessInput()
                 break;
 
             case SDLK_w:
-                myPlayer.m_positionY -= 5;
+                myPlayer.m_positionX += 5 * cos(myPlayer.m_angleInRadians);
+                myPlayer.m_positionY += 5 * sin(myPlayer.m_angleInRadians);
                 break;
-            case SDLK_a:
-                myPlayer.m_positionX -= 5;
-                break;
+
             case SDLK_s:
-                myPlayer.m_positionY += 5;
+                myPlayer.m_positionX -= 5 * cos(myPlayer.m_angleInRadians);
+                myPlayer.m_positionY -= 5 * sin(myPlayer.m_angleInRadians);
                 break;
+
+            case SDLK_a:
+                myPlayer.m_angleInRadians -= 0.1;
+                if (myPlayer.m_angleInRadians > 2 * PI) { myPlayer.m_angleInRadians -= 2 * PI; }
+                break;
+            
             case SDLK_d:
-                myPlayer.m_positionX += 5;
+                myPlayer.m_angleInRadians += 0.1;
+                if (myPlayer.m_angleInRadians < 0) { myPlayer.m_angleInRadians += 2 * PI; }
                 break;
 
             default:
@@ -174,9 +183,19 @@ void ReleaseMemory()
 void DrawPlayer()
 {
     // Display a basic yellow rectangle player
-    SDL_Rect ballRectangle = { myPlayer.m_positionX, myPlayer.m_positionY, myPlayer.m_width, myPlayer.m_height };
     SDL_SetRenderDrawColor(rendererPtr, 255, 255, 0, 255);
+    
+    SDL_Rect ballRectangle = { (int)roundf(myPlayer.m_positionX), (int)roundf(myPlayer.m_positionY), myPlayer.m_width, myPlayer.m_height };
     SDL_RenderFillRect(rendererPtr, &ballRectangle);
+
+    int32_t playerCenterX = (int)roundf(myPlayer.m_positionX) + myPlayer.m_width / 2;
+    int32_t playerCenterY = (int)roundf(myPlayer.m_positionY) + myPlayer.m_width / 2;
+    SDL_RenderDrawLine(rendererPtr,
+                        playerCenterX,
+                        playerCenterY,
+                        (int)roundf(playerCenterX + 20.f * cos(myPlayer.m_angleInRadians)),
+                        (int)roundf(playerCenterY + 20.f * sin(myPlayer.m_angleInRadians)));
+
 }
 
 void Draw2DMap()

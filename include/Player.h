@@ -5,10 +5,11 @@
 
 typedef struct Player
 {
-	int32_t m_positionX;
-	int32_t m_positionY;
+	float m_positionX;
+	float m_positionY;
 	int32_t m_width;
 	int32_t m_height;
+	float m_angleInRadians;
 } Player;
 
 #endif 
